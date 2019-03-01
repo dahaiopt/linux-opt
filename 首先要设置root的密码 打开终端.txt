@@ -1,0 +1,16 @@
+﻿首先要设置root的密码 打开终端
+ 
+sudo passwd root
+ 
+设好密码
+ 
+然后输入
+ 
+cd /etc/lightdm
+sudo gedit  lightdm.conf
+在最下面添加两行
+ 
+greeter-show-manual-login=true
+allow-guest=false #禁止guest登录（感觉这句可以不加，源教程上写了，我也加上了。你可以测试一下。)
+
+保存，重启，注销当前用户，然后可以选其他用户登录。输入root，再输入密码即可。

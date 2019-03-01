@@ -1,0 +1,77 @@
+tsocks
+
+
+MariaDB 与 MySQL 
+兼容性区别：
+兼容性
+
+MariaDB是MySQL的二进制替代品
+
+出于实用的目的，MariaDB是同一MySQL版本的二进制替代品(例如MySQL 5.1->MariaDB 5.1, MariaDB5.2和MariaDB 5.3是兼容的。MySQL 5.5将会和MariaDB 5.5保持兼容)。这意味着:
+
+这意味着对于大多数情况下，您可以卸载MySQL和安装MariaDB，可以工作很好。(不需要转换成任何数据文件，如果使用同一主版本,比如5.1)。
+
+我们每月会与MySQL代码库合并来确保我们的兼容性和得到任何Oracle修正的bug和所有特性。
+
+我们在脚本升级方面也做了大量的工作，从MySQL 5.0升级到MariaDB 5.1比从MySQL 5.0到MySQL 5.1更容易。
+
+这就是说:MariaDB有许多的新选项、扩展，存储引擎和bug修复,而MySQL是没有的。您可以在MariaDB分发版本差异页面找到不同版本的功能特性集。可在MariaDB versus MySQL – Features看到。
+
+MariaDB 5.1与MySQL 5.1的不兼容性
+
+为了让MariaDB比MySQL提供更多更好的信息，极少情况下MariaDB会出现不兼容情况。
+
+如果使用MariaDB 5.1替代MySQL5.1，您将看到如下列举的全部已知用户级不兼容情况:
+
+安装的包名称，用MariaDB代替MySQL。
+时间控制可能不同，MariaDB在许多情况下比MySQL快。
+mysqld在MariaDB读取是my.cnf中[MariaDB ]的部分。
+如果它不是完全相同的MariaDB编译版本，不能使用仅提供二进制的存储引擎库给MariaDB使用 (这是因为服务器内部结构THD在MySQL和MariaDB之间不同。这也是与常见的MySQL版本不同的)。这应该不是问题，因为对于大多数人不加载新存储引擎，MariaDB比MySQL带有更多的存储引擎。
+CHECKSUM TABLE可能产生不同的结果，由于MariaDB并不忽视NULL的列，MySQL 5.1忽略(未来的MySQL版本应该计算checksums和MariaDB一样)。在MariaDB 开启mysqld –old选项，您可以得到"旧式"的校验和。但是要注意,这个MyISAM存储引擎和Aria 存储引擎在MariaDB实际上在内部使用新的checksum,因此,如果您使用的是-old , CHECKSUM命令将会更慢,因为它需要,一行一行的计算checksum。
+慢速查询日志有更多信息关于查询, 如果有一个脚本解析慢速查询日志这可能是一个问题。
+MariaDB默认情况下比MySQL需要更多的内存,因为我们有默认情况下启用Aria存储引擎处理内部临时表。如果需要MariaDB使用很少的内存(这是以牺牲性能为代价的),您可以设置aria_pagecache_buffer_size的值为 1M(默认值为128M)。
+如果正在使用MariaDB的新命令选项，新特性或新存储引擎，那么就不能在MySQL和MariaDB之间轻易来回切换了。
+
+MariaDB 5.2与MySQL 5.1的不兼容性
+
+同MariaDB 5.1和MySQL 5.1的一样，再补充一条:
+
+新增SQL_MODE的取值:IGNORE_BAD_TABLE_OPTIONS。如果未设置该值，使用一个表、字段或索引的属性(选项)不被支持的存储引擎将会导致错误。这个变化可能引起警告不正确的表定义出现在错误日志中，请利用mysql_upgrade修复这个警告。
+实际上，MariaDB 5.2是MariaDB 5.1和MySQL 5.1替代品。
+
+MariaDB 5.3与MySQL 5.1和MariaDB 5.2的不兼容性
+
+一些错误信息涉及到错误转换的，MariaDB的差别在于消息中提供了更多的信息关于到底是哪里出了错。
+MariaDB专用的错误编号已经从1900开始，为的是不与MySQL的错误冲突。
+MariaDB在所有工作场景中可以基于微秒计时工作;而MySQL在某些情况下，如datetime和time，确实会丢失微秒部分。
+旧的--maria启动选项被删除。应该使用--aria前缀代替。(MariaDB 5.2都支持这-maria-和- aria-)
+SHOW PROCESSLIST有一个额外的process列，显示一些命令的进度。您可以启动mysqld用–old 标志禁用它。
+INFORMATION_SCHEMA.PROCESSLIST对进度报告有三个新列: STAGE, MAX_STAGE和 PROGRESS。
+以/*M! 或/*M!#####起头的长注释会得到执行。
+如果使用max_user_connections = 0(也就是说任何数量的连接)启动mysqld,您就不能在mysqld运行时修改全局变量了。这是因为当mysqld以max_user_connections = 0启动时,它不分配计数结构(包括每个连接的互斥锁)。如果稍后改变变量，这将导致错误的计数器。如果希望在运行时能改变这个变量，请在启动时将它设置为一个较高的值。
+可以设置max_user_connections(包括全局变量和GRANT选项两种场景)为-1来阻止用户连接到服务器。全局变量max_user_connections变量不影响拥有super特权的用户连接。
+IGNORE指令并不会忽略所有错误(比如致命错误)，只是会忽略可以安全忽略的那些。
+
+MariaDB 5.5与MariaDB 5.3的不兼容性
+
+XtraDB
+
+XtraDB提供者Percona，在5.5代码库并未提供XtraDB所有早些时候的功能特性。正因为如此,MariaDB 5.5也不能提供它们所有功能特性。
+
+在5.5版本中XtraDB缺少的选项
+
+以下选项XtraDB 5.5是不支持的。如果在my.cnf文件中使用到这些选项，请删除后再升级到5.5。
+
+innodb-adaptive-checkpoint;请使用innodb_adaptive_flushing_method 替代。
+innodb-auto-lru-dump;请使用innodb_buffer_pool_restore_at_startup 替代。
+innodb-blocking-lru-restore;请使用innodb-blocking-buffer-pool-restore 替代。
+innodb-enable-unsafe-group-commit
+innodb-expand-import;请使用 innodb_import_table_from_xtrabackup 替代。
+innodb-extra-rsegments;请使用innodb_rollback_segment 替代。
+innodb-extra-undoslots
+innodb-fast-recovery
+innodb-flush-log-at-trx-commit-session
+innodb-overwrite-relay-log-info
+innodb-pass-corrupt-table;请使用innodb_corrupt_table_action 替代。
+innodb-use-purge-thread
+xtradb-enhancements

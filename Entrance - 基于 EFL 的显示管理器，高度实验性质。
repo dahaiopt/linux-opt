@@ -1,0 +1,25 @@
+Entrance - 基于 EFL 的显示管理器，高度实验性质。
+
+
+GDM - GNOME 显示管理器。
+
+
+KDM - KDE4 显示管理器（不再继续开发）。
+
+
+LightDM - 跨桌面显示管理器，可以使用任何工具集写就的各种前端。（ubuntu默认是这个）
+
+
+LXDM - LXDE 显示管理器，可以独立于 LXDE 桌面环境使用。
+
+
+MDM - MDM 显示管理器，在 Linux Mint 中使用， GDM 2 的一个 fork。
+
+
+SDDM - 基于 QML 的显示管理器，KDE 4 的 kdm 的继任者；Plasma 5 以及 LXQt 推荐。
+
+
+SLiM - 轻量且优雅的图形化登录解决方案（不再继续开发）。
+
+
+XDM - 带有 XDMCP，主机选择支持的 X 显示管理器。
